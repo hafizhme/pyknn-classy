@@ -26,7 +26,7 @@ class Knn(object):
 
 
         i = 0
-        while (i < 30000):
+        while (i < 20000):
             check = self.test[i]
 
 
@@ -36,11 +36,14 @@ class Knn(object):
             j = 0
             while (j < 70000):
                 train = self.data[j]
-                k = 0
-                distance.append(0)
-                while (k < 11):
-                    distance[j] += (train[k]-check[k])*(train[k]-check[k])
-                    k += 1
+                distance.append(
+                    (train[4]-check[4])*(train[4]-check[4])+
+                    (train[7]-check[7])*(train[7]-check[7])
+                    )
+                # k = 0
+                # while (k < 11):
+                #     distance[j] += (train[k]-check[k])*(train[k]-check[k])
+                #     k += 1
                 # print(j, distance[j])
                 j += 1
 
@@ -83,11 +86,11 @@ class Knn(object):
                     # print("  Verdict is TRUE")
                 # else:
                     # print("  Verdict is FALSE")
-            print("Data Testing ", i, "/", 29999, "| progress :", ((i+1)/30000)*100, "%")
+            print("Data Testing ", i, "/", 19999, "| progress :", ((i+1)/20000)*100, "%")
             print(" ", check[11])
             print("  yes : no =", yes, ":", no)
             print("  Current accuracy :", (self.accuracy / (i+1))*100, "%")
             print()
             i += 1
 
-        print("Your accuracy :", (self.accuracy / 30000)*100, "%")
+        print("Your accuracy :", (self.accuracy / 20000)*100, "%")
