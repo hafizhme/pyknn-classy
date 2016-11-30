@@ -1,96 +1,98 @@
 from sys import argv
+import csv
 
 class Knn(object):
     """docstring for Knn."""
-    def __init__(self, k):
+    def __init__(self, k, filedir):
         super(Knn, self).__init__()
         self.k = k
-        self.data = []
-        self.test = []
-        self.accuracy = 0
+        self.train = []
+        self.__rtrain__(filedir)
 
-    def readdt(self, filedir):
+    def __rtrain__(self, filedir):
         f = open(filedir, "r")
-        f.readline()
-        a = f.readline()
-        n = 0
-        while ( a is not "" ):
-            n += 1
-            if (n <= 70000):
-                self.data.append([float(x) for x in a.replace("\n", "").split(',')])
-            else:
-                self.test.append([float(x) for x in a.replace("\n", "").split(',')])
-            a = f.readline()
 
-    def testing(self):
+        ftrain = csv.reader(f)
+        ftrain = iter(ftrain)
 
+        self.train.append(next(ftrain))
+        for row in ftrain:
+            ready = []
+            row = iter(row)
+            ready.append(int(next(row)))
+            for i in range(10):
+                ready.append(float(next(row)))
+            ready.append(int(next(row)))
+            self.train.append(ready)
 
-        i = 0
-        while (i < 20000):
-            check = self.test[i]
+    def rout(self, filedir):
+        fin = open(filedir, "r")
+        fou = open("Out.csv", "w")
 
+        ftest = csv.reader(fin)
+        fout = csv.writer(fou, delimiter=",")
 
-            # Calculate the distance between the query instance and all the training samples
-            # print("  Step 1")
+        ftest = iter(ftest)
+
+        header = next(ftest)
+        header.append("y")
+
+        fout.writerow(header)
+
+        count=1
+        for test in ftest:
             distance = []
-            j = 0
-            while (j < 70000):
-                train = self.data[j]
-                distance.append(
-                    (train[4]-check[4])*(train[4]-check[4])+
-                    (train[7]-check[7])*(train[7]-check[7])
-                    )
-                # k = 0
-                # while (k < 11):
-                #     distance[j] += (train[k]-check[k])*(train[k]-check[k])
-                #     k += 1
-                # print(j, distance[j])
-                j += 1
+            distance.append("not used")
 
-            # Find the k first minimum distance
-            # print("  Step 2")
+
+            # Find distance
+            j = 1
+            while (j < len(self.train)):
+                train = self.train[j]
+                asd = (train[4]-float(test[4]))**2 + (train[7]-float(test[7]))**2
+                distance.append(
+                    asd
+                )
+                j+=1
+
+            # Find k first miminum
             minimum = []
             k = 0
             while (k < self.k):
-                j = 1
-                mini = 0
-                while (j < 70000):
-                    if (distance[i] <= distance[mini] ):
-                        if (j not in minimum):
-                            mini = j
-                    j += 1
-                minimum.append(mini)
+                i = 1
+                idMini = 1
+                while (i < len(distance)):
+                    if (distance[i] < distance[idMini]):
+                        if (i not in minimum):
+                            idMini = i
+                    i += 1
+                minimum.append(idMini)
                 k += 1
 
+
+
             # Gather classification
-            # print("  Step 3")
             yes = 0
             no = 0
             k = 0
             while (k < self.k):
-                if (self.data[minimum[k]][11] == 1.0):
+                if (self.train[minimum[k]][11] == 1):
                     yes+=1
                 else:
                     no+=1
                 k += 1
 
-            if (yes >= no):
-                if (check[11] == 1.0):
-                    self.accuracy += 1
-                    # print("  Verdict is TRUE")
-                # else:
-                    # print("  Verdict is FALSE")
+            verdi = 1
+            if (yes > no):
+                verdi = 1
             else:
-                if (check[11] == 0.0):
-                    self.accuracy += 1
-                    # print("  Verdict is TRUE")
-                # else:
-                    # print("  Verdict is FALSE")
-            print("Data Testing ", i, "/", 19999, "| progress :", ((i+1)/20000)*100, "%")
-            print(" ", check[11])
-            print("  yes : no =", yes, ":", no)
-            print("  Current accuracy :", (self.accuracy / (i+1))*100, "%")
-            print()
-            i += 1
+                verdi = 0
 
-        print("Your accuracy :", (self.accuracy / 20000)*100, "%")
+
+            # Save
+            test.append(verdi)
+            fout.writerow(test)
+            print()
+            print("Done :",count,"/ 10000")
+            print("Progress :",count/10000,"%")
+            count+=1
